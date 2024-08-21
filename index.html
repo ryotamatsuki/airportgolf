@@ -47,31 +47,23 @@
         <h4 class="txt-m txt-bold mb6">Choose a travel mode:</h4>
         <div class="mb12 mr12 toggle-group align-center">
           <label class="toggle-container">
-            <input name="profile" type="radio" value="walking" />
-            <div class="toggle toggle--active-null toggle--null">Walking</div>
-          </label>
-          <label class="toggle-container">
-            <input name="profile" type="radio" value="cycling" checked />
-            <div class="toggle toggle--active-null toggle--null">Cycling</div>
-          </label>
-          <label class="toggle-container">
-            <input name="profile" type="radio" value="driving" />
+            <input name="profile" type="radio" value="driving" checked />
             <div class="toggle toggle--active-null toggle--null">Driving</div>
           </label>
         </div>
         <h4 class="txt-m txt-bold mb6">Choose a maximum duration:</h4>
         <div class="mb12 mr12 toggle-group align-center">
           <label class="toggle-container">
-            <input name="duration" type="radio" value="10" checked />
-            <div class="toggle toggle--active-null toggle--null">10 min</div>
-          </label>
-          <label class="toggle-container">
-            <input name="duration" type="radio" value="20" />
-            <div class="toggle toggle--active-null toggle--null">20 min</div>
-          </label>
-          <label class="toggle-container">
-            <input name="duration" type="radio" value="30" />
+            <input name="duration" type="radio" value="30" checked />
             <div class="toggle toggle--active-null toggle--null">30 min</div>
+          </label>
+          <label class="toggle-container">
+            <input name="duration" type="radio" value="40" />
+            <div class="toggle toggle--active-null toggle--null">40 min</div>
+          </label>
+          <label class="toggle-container">
+            <input name="duration" type="radio" value="50" />
+            <div class="toggle toggle--active-null toggle--null">50 min</div>
           </label>
           <label class="toggle-container">
             <input name="duration" type="radio" value="60" />
@@ -105,6 +97,16 @@
         { name: 'エリエールゴルフクラブ松山', coords: [132.814839, 33.921854] }
       ];
 
+      // 観光地のデータ
+      const touristSpots = [
+        { name: '松山城', coords: [132.765471, 33.845739] },
+        { name: '道後温泉本館', coords: [132.786402, 33.852173] },
+        { name: '伊佐爾波神社', coords: [132.788964, 33.850776] },
+        { name: '石手寺', coords: [132.796474, 33.847916] },
+        { name: '圓満寺', coords: [132.787574, 33.852091] },
+        { name: 'とべ動物園', coords: [132.791972, 33.764260] }
+      ];
+
       // Target the params form in the HTML
       const params = document.getElementById('params');
 
@@ -112,8 +114,8 @@
       const urlBase = 'https://api.mapbox.com/isochrone/v1/mapbox/';
       const lon = 132.703414; // updated longitude
       const lat = 33.828943; // updated latitude
-      let profile = 'cycling';
-      let minutes = 10;
+      let profile = 'driving';
+      let minutes = 30;
 
       // Set up a marker that you can use to show the query's coordinates
       const marker = new mapboxgl.Marker({
@@ -154,6 +156,34 @@
           .addTo(map);
       });
 
+      // 観光地のマーカーとラベルを追加
+      touristSpots.forEach(spot => {
+        const el = document.createElement('div');
+        el.className = 'marker';
+        el.style.backgroundColor = 'red';
+        el.style.width = '10px';
+        el.style.height = '10px';
+        el.style.borderRadius = '50%';
+
+        new mapboxgl.Marker(el)
+          .setLngLat(spot.coords)
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(spot.name))
+          .addTo(map);
+
+        // ラベルを追加
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = spot.name;
+
+        new mapboxgl.Marker({
+          element: label,
+          anchor: 'left'
+        })
+          .setLngLat(spot.coords)
+          .setOffset([15, 0])
+          .addTo(map);
+      });
+
       // Create a function that sets up the Isochrone API query then makes a fetch call
       async function getIso() {
         try {
@@ -175,9 +205,7 @@
 
       // When a user changes the value of profile or duration by clicking a button, change the parameter's value and make the API query again
       params.addEventListener('change', (event) => {
-        if (event.target.name === 'profile') {
-          profile = event.target.value;
-        } else if (event.target.name === 'duration') {
+        if (event.target.name === 'duration') {
           minutes = parseInt(event.target.value, 10);
         }
         console.log(`Selected duration: ${minutes} minutes`);
