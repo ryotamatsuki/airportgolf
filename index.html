@@ -1,3 +1,6 @@
+以下のコードで観光地をゴルフ場に置き換えました。
+
+```html
 <!doctype html>
 <html lang="en">
   <head>
@@ -87,31 +90,22 @@
       const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v12',
-        center: [132.70341355675782, 33.82894252956049], // updated starting position [lng, lat]
+        center: [132.70341355675782, 33.82894252956049], // starting position [lng, lat]
         zoom: 11.5
       });
 
       // ゴルフ場のデータ
       const golfCourses = [
-        { name: '松山ゴルフ倶楽部', coords: [132.92276, 33.80097] },
-        { name: '新居浜カントリー倶楽部', coords: [133.35144, 33.92857] },
-        { name: '大洲ゴルフ倶楽部', coords: [132.54259, 33.47245] },
-        { name: '松山国際ゴルフ倶楽部', coords: [132.85098, 33.77166] },
-        { name: '道後ゴルフ倶楽部', coords: [132.7921, 33.87962] },
-        { name: '今治カントリー倶楽部', coords: [133.00803, 33.97193] },
-        { name: '久万カントリークラブ', coords: [132.87756, 33.69842] },
-        { name: '松山ロイヤルゴルフ倶楽部', coords: [132.76497, 33.6757] },
-        { name: '高原ゴルフ倶楽部', coords: [132.94107, 33.67177] },
-        { name: '愛媛ゴルフ倶楽部', coords: [132.64514, 33.57552] },
-        { name: '宇和島カントリー倶楽部', coords: [132.57867, 33.31305] },
-        { name: '松山シーサイドカントリークラブ', coords: [132.81537, 34.01854] },
-        { name: '北条カントリー倶楽部', coords: [132.82086, 33.97079] },
-        { name: 'チサンカントリークラブ北条', coords: [132.76555, 33.83916] },
-        { name: '滝の宮カントリークラブ', coords: [133.26831, 33.91184] },
-        { name: 'エリエールゴルフクラブ松山', coords: [132.83066, 33.92586] },
-        { name: 'タカガワ新伊予ゴルフ倶楽部', coords: [133.40111, 33.96988] },
-        { name: 'サンセットヒルズカントリークラブ', coords: [132.81326, 33.97892] },
-        { name: '西条ゴルフ倶楽部', coords: [133.18561, 33.88711] }
+        { name: 'チサンカントリークラブ北条', coords: [132.8284111, 33.993806] },
+        { name: '松山国際ゴルフ倶楽部', coords: [132.8621852, 33.761032] },
+        { name: '松山ロイヤルゴルフ倶楽部', coords: [132.7552783, 33.748611] },
+        { name: '松山シーサイドカントリークラブ', coords: [132.9361114, 34.065556] },
+        { name: 'タカガワ新伊予ゴルフ倶楽部', coords: [133.5630565, 33.980833] },
+        { name: '北条カントリー倶楽部', coords: [132.8280566, 33.993056] },
+        { name: '道後ゴルフ倶楽部', coords: [132.7655567, 33.839167] },
+        { name: '久万カントリークラブ', coords: [132.8333338, 33.733333] },
+        { name: '松山ゴルフ倶楽部', coords: [132.9298229, 33.803592] },
+        { name: 'エリエールゴルフクラブ松山', coords: [132.833333, 33.833333] }
       ];
 
       // Target the params form in the HTML
@@ -139,14 +133,14 @@
       golfCourses.forEach(course => {
         const el = document.createElement('div');
         el.className = 'marker';
-        el.style.backgroundColor = 'green';
+        el.style.backgroundColor = 'red';
         el.style.width = '10px';
         el.style.height = '10px';
         el.style.borderRadius = '50%';
 
         new mapboxgl.Marker(el)
           .setLngLat(course.coords)
-          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(course.name))
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(course.name)) // マーカーにポップアップを追加
           .addTo(map);
 
         // ラベルを追加
@@ -159,7 +153,7 @@
           anchor: 'left'
         })
           .setLngLat(course.coords)
-          .setOffset([15, 0])
+          .setOffset([15, 0]) // ポイントからの距離を設定
           .addTo(map);
       });
 
@@ -212,6 +206,8 @@
             'paint': {
               'fill-color': '#5a3fc0',
               'fill-opacity': 0.3
+
+
             }
           },
           'poi-label'
@@ -226,3 +222,6 @@
     </script>
   </body>
 </html>
+```
+
+このコードでは、観光地の情報がゴルフ場に置き換えられており、各ゴルフ場の位置にマーカーとラベルが表示されます。
