@@ -94,7 +94,8 @@
         { name: '道後ゴルフ倶楽部', coords: [132.786384, 33.875593] },
         { name: '久万カントリークラブ', coords: [132.886831, 33.687439] },
         { name: '松山ゴルフ倶楽部', coords: [132.929933, 33.803745] },
-        { name: 'エリエールゴルフクラブ松山', coords: [132.814839, 33.921854] }
+        { name: 'エリエールゴルフクラブ松山', coords: [132.814839, 33.921854] },
+        { name: '高原ゴルフ倶楽部', coords: [132.944343, 33.669462] },
         { name: '大洲ゴルフ倶楽部', coords: [132.545094, 33.476941] },
         { name: '奥道後ゴルフクラブ', coords: [132.797897, 33.958388] },
         { name: '西条ゴルフ倶楽部', coords: [133.185979, 33.889449] },
@@ -187,64 +188,4 @@
           .addTo(map);
       });
 
-      // Create a function that sets up the Isochrone API query then makes a fetch call
-      async function getIso() {
-        try {
-          const query = await fetch(
-            `${urlBase}${profile}/${lon},${lat}?contours_minutes=${minutes}&polygons=true&access_token=${mapboxgl.accessToken}`,
-            { method: 'GET' }
-          );
-          if (!query.ok) {
-            throw new Error(`API request failed with status ${query.status}`);
-          }
-          const data = await query.json();
-          // Set the 'iso' source's data to what's returned by the API query
-          map.getSource('iso').setData(data);
-        } catch (error) {
-          console.error('Error fetching Isochrone data:', error);
-          alert('Isochrone data could not be retrieved. Please check the console for details.');
-        }
-      }
-
-      // When a user changes the value of profile or duration by clicking a button, change the parameter's value and make the API query again
-      params.addEventListener('change', (event) => {
-        if (event.target.name === 'duration') {
-          minutes = parseInt(event.target.value, 10);
-        }
-        console.log(`Selected duration: ${minutes} minutes`);
-        getIso();
-      });
-
-      map.on('load', () => {
-        // When the map loads, add the source and layer
-        map.addSource('iso', {
-          type: 'geojson',
-          data: {
-            'type': 'FeatureCollection',
-            'features': []
-          }
-        });
-
-        map.addLayer(
-          {
-            'id': 'isoLayer',
-            'type': 'fill',
-            'source': 'iso',
-            'layout': {},
-            'paint': {
-              'fill-color': '#5a3fc0',
-              'fill-opacity': 0.3
-            }
-          },
-          'poi-label'
-        );
-
-        // Initialize the marker at the query coordinates
-        marker.setLngLat(lngLat).addTo(map);
-
-        // Make the API call
-        getIso();
-      });
-    </script>
-  </body>
-</html>
+      // Create a function that sets up the Isochrone API query
