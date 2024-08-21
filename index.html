@@ -1,6 +1,3 @@
-以下のコードで観光地をゴルフ場に置き換えました。
-
-```html
 <!doctype html>
 <html lang="en">
   <head>
@@ -90,22 +87,22 @@
       const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v12',
-        center: [132.70341355675782, 33.82894252956049], // starting position [lng, lat]
+        center: [132.70341355675782, 33.82894252956049], // updated starting position [lng, lat]
         zoom: 11.5
       });
 
       // ゴルフ場のデータ
       const golfCourses = [
-        { name: 'チサンカントリークラブ北条', coords: [132.8284111, 33.993806] },
-        { name: '松山国際ゴルフ倶楽部', coords: [132.8621852, 33.761032] },
-        { name: '松山ロイヤルゴルフ倶楽部', coords: [132.7552783, 33.748611] },
-        { name: '松山シーサイドカントリークラブ', coords: [132.9361114, 34.065556] },
-        { name: 'タカガワ新伊予ゴルフ倶楽部', coords: [133.5630565, 33.980833] },
-        { name: '北条カントリー倶楽部', coords: [132.8280566, 33.993056] },
-        { name: '道後ゴルフ倶楽部', coords: [132.7655567, 33.839167] },
-        { name: '久万カントリークラブ', coords: [132.8333338, 33.733333] },
-        { name: '松山ゴルフ倶楽部', coords: [132.9298229, 33.803592] },
-        { name: 'エリエールゴルフクラブ松山', coords: [132.833333, 33.833333] }
+        { name: 'チサンカントリークラブ北条', coords: [132.77962, 33.97898] },
+        { name: '松山国際ゴルフ倶楽部', coords: [132.84114, 33.79486] },
+        { name: '松山ロイヤルゴルフ倶楽部', coords: [132.87503, 33.80949] },
+        { name: '松山シーサイドカントリークラブ', coords: [132.7012, 33.81367] },
+        { name: 'タカガワ新伊予ゴルフ倶楽部', coords: [133.57347, 34.01243] },
+        { name: '北条カントリー倶楽部', coords: [132.77962, 33.97898] },
+        { name: '道後ゴルフ倶楽部', coords: [132.76326, 33.83344] },
+        { name: '久万カントリークラブ', coords: [132.90167, 33.6556] },
+        { name: '松山ゴルフ倶楽部', coords: [132.87503, 33.80949] },
+        { name: 'エリエールゴルフクラブ松山', coords: [132.79076, 33.79827] }
       ];
 
       // Target the params form in the HTML
@@ -140,7 +137,7 @@
 
         new mapboxgl.Marker(el)
           .setLngLat(course.coords)
-          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(course.name)) // マーカーにポップアップを追加
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(course.name))
           .addTo(map);
 
         // ラベルを追加
@@ -153,7 +150,7 @@
           anchor: 'left'
         })
           .setLngLat(course.coords)
-          .setOffset([15, 0]) // ポイントからの距離を設定
+          .setOffset([15, 0])
           .addTo(map);
       });
 
@@ -206,8 +203,6 @@
             'paint': {
               'fill-color': '#5a3fc0',
               'fill-opacity': 0.3
-
-
             }
           },
           'poi-label'
@@ -222,6 +217,3 @@
     </script>
   </body>
 </html>
-```
-
-このコードでは、観光地の情報がゴルフ場に置き換えられており、各ゴルフ場の位置にマーカーとラベルが表示されます。
