@@ -97,6 +97,16 @@
         { name: 'エリエールゴルフクラブ松山', coords: [132.814839, 33.921854] }
       ];
 
+      // 観光地のデータ
+      const touristSpots = [
+        { name: '松山城', coords: [132.765471, 33.845739] },
+        { name: '道後温泉本館', coords: [132.786402, 33.852173] },
+        { name: '伊佐爾波神社', coords: [132.788964, 33.850776] },
+        { name: '石手寺', coords: [132.796474, 33.847916] },
+        { name: '圓満寺', coords: [132.787574, 33.852091] },
+        { name: 'とべ動物園', coords: [132.791972, 33.764260] }
+      ];
+
       // Target the params form in the HTML
       const params = document.getElementById('params');
 
@@ -142,6 +152,34 @@
           anchor: 'left'
         })
           .setLngLat(course.coords)
+          .setOffset([15, 0])
+          .addTo(map);
+      });
+
+      // 観光地のマーカーとラベルを追加
+      touristSpots.forEach(spot => {
+        const el = document.createElement('div');
+        el.className = 'marker';
+        el.style.backgroundColor = 'red';
+        el.style.width = '10px';
+        el.style.height = '10px';
+        el.style.borderRadius = '50%';
+
+        new mapboxgl.Marker(el)
+          .setLngLat(spot.coords)
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(spot.name))
+          .addTo(map);
+
+        // ラベルを追加
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = spot.name;
+
+        new mapboxgl.Marker({
+          element: label,
+          anchor: 'left'
+        })
+          .setLngLat(spot.coords)
           .setOffset([15, 0])
           .addTo(map);
       });
