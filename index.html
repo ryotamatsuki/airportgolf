@@ -87,22 +87,22 @@
       const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v12',
-        center: [132.70341355675782, 33.82894252956049], // updated starting position [lng, lat]
+        center: [132.703414, 33.828943], // updated starting position [lng, lat]
         zoom: 11.5
       });
 
       // ゴルフ場のデータ
       const golfCourses = [
-        { name: 'チサンカントリークラブ北条', coords: [132.82864307208686, 33.993934080668645] },
-        { name: '松山国際ゴルフ倶楽部', coords: [132.86226725044378, 33.76108566124546] },
-        { name: '松山ロイヤルゴルフ倶楽部', coords: [132.7689542114859, 33.69273114655289] },
-        { name: '松山シーサイドカントリークラブ', coords: [132.8245817384826, 34.01478964146882] },
-        { name: 'タカガワ新伊予ゴルフ倶楽部', coords: [133.400251255677, 33.970970642678445] },
-        { name: '北条カントリー倶楽部', coords: [132.82447696731688, 33.96651816000571] },
-        { name: '道後ゴルフ倶楽部', coords: [132.78638389429707, 33.87559294095973] },
-        { name: '久万カントリークラブ', coords: [132.88683059614164, 33.6874385365444] },
-        { name: '松山ゴルフ倶楽部', coords: [132.92993298450625, 33.803745445312856] },
-        { name: 'エリエールゴルフクラブ松山', coords: [132.8148390035591, 33.921853737457] }
+        { name: 'チサンカントリークラブ北条', coords: [132.828643, 33.993934] },
+        { name: '松山国際ゴルフ倶楽部', coords: [132.862267, 33.761086] },
+        { name: '松山ロイヤルゴルフ倶楽部', coords: [132.768954, 33.692731] },
+        { name: '松山シーサイドカントリークラブ', coords: [132.824582, 34.014790] },
+        { name: 'タカガワ新伊予ゴルフ倶楽部', coords: [133.400251, 33.970971] },
+        { name: '北条カントリー倶楽部', coords: [132.824477, 33.966518] },
+        { name: '道後ゴルフ倶楽部', coords: [132.786384, 33.875593] },
+        { name: '久万カントリークラブ', coords: [132.886831, 33.687439] },
+        { name: '松山ゴルフ倶楽部', coords: [132.929933, 33.803745] },
+        { name: 'エリエールゴルフクラブ松山', coords: [132.814839, 33.921854] }
       ];
 
       // Target the params form in the HTML
@@ -110,8 +110,8 @@
 
       // Create variables to use in getIso()
       const urlBase = 'https://api.mapbox.com/isochrone/v1/mapbox/';
-      const lon = 132.70341355675782; // updated longitude
-      const lat = 33.82894252956049; // updated latitude
+      const lon = 132.703414; // updated longitude
+      const lat = 33.828943; // updated latitude
       let profile = 'cycling';
       let minutes = 10;
 
