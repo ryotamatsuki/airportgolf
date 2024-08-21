@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Demo: Get started with the Isochrone API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Mapbox GL JS -->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+    <link
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <!-- Mapbox Assembly -->
+    <link
+      href="https://api.mapbox.com/mapbox-assembly/v1.3.0/assembly.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://api.mapbox.com/mapbox-assembly/v1.3.0/assembly.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+
+      .label {
+        font-size: 12px;
+        color: black;
+        background-color: transparent;
+        padding: 2px;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="map"></div>
+
+    <div class="absolute fl my24 mx24 py24 px24 bg-gray-faint round">
+      <form id="params">
+        <h4 class="txt-m txt-bold mb6">Choose a travel mode:</h4>
+        <div class="mb12 mr12 toggle-group align-center">
+          <label class="toggle-container">
+            <input name="profile" type="radio" value="walking" />
+            <div class="toggle toggle--active-null toggle--null">Walking</div>
+          </label>
+          <label class="toggle-container">
+            <input name="profile" type="radio" value="cycling" checked />
+            <div class="toggle toggle--active-null toggle--null">Cycling</div>
+          </label>
+          <label class="toggle-container">
+            <input name="profile" type="radio" value="driving" />
+            <div class="toggle toggle--active-null toggle--null">Driving</div>
+          </label>
+        </div>
+        <h4 class="txt-m txt-bold mb6">Choose a maximum duration:</h4>
+        <div class="mb12 mr12 toggle-group align-center">
+          <label class="toggle-container">
+            <input name="duration" type="radio" value="10" checked />
+            <div class="toggle toggle--active-null toggle--null">10 min</div>
+          </label>
+          <label class="toggle-container">
+            <input name="duration" type="radio" value="20" />
+            <div class="toggle toggle--active-null toggle--null">20 min</div>
+          </label>
+          <label class="toggle-container">
+            <input name="duration" type="radio" value="30" />
+            <div class="toggle toggle--active-null toggle--null">30 min</div>
+          </label>
+          <label class="toggle-container">
+            <input name="duration" type="radio" value="60" />
+            <div class="toggle toggle--active-null toggle--null">1 h</div>
+          </label>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      mapboxgl.accessToken = 'pk.eyJ1IjoiYnVkb3RvIiwiYSI6ImNtMDI4YnByNjFuNjYyanNmdXMzNHVvdnkifQ.FzJuyAndS1cOfzz3vLxv4w';
+
+      const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [132.70341355675782, 33.82894252956049], // updated starting position [lng, lat]
+        zoom: 11.5
+      });
+
+      // ゴルフ場のデータ
+      const golfCourses = [
+        { name: '松山ゴルフ倶楽部', coords: [132.9298, 33.8036] },
+        { name: '新居浜カントリー倶楽部', coords: [133.353, 33.9312] },
+        { name: '大洲ゴルフ倶楽部', coords: [132.5449, 33.4768] },
+        { name: '松山国際ゴルフ倶楽部', coords: [132.8622, 33.761] },
+        { name: '道後ゴルフ倶楽部', coords: [132.787, 33.839] },
+        { name: '今治カントリー倶楽部', coords: [133.03, 33.9667] },
+        { name: '久万カントリークラブ', coords: [132.7033, 33.7489] },
+        { name: '松山ロイヤルゴルフ倶楽部', coords: [132.7655, 33.8391] },
+        { name: '高原ゴルフ倶楽部', coords: [132.7033, 33.7489] },
+        { name: '愛媛ゴルフ倶楽部', coords: [132.648, 33.5619] },
+        { name: '宇和島カントリー倶楽部', coords: [132.5606, 33.2231] },
+        { name: '松山シーサイドカントリークラブ', coords: [133.2833, 33.96] },
+        { name: '北条カントリー倶楽部', coords: [132.8284, 33.9938] },
+        { name: 'チサンカントリークラブ北条', coords: [132.8284, 33.9938] },
+        { name: '滝の宮カントリークラブ', coords: [133.2703, 33.9379] },
+        { name: 'エリエールゴルフクラブ松山', coords: [132.8145, 33.9215] },
+        { name: 'タカガワ新伊予ゴルフ倶楽部', coords: [133.2833, 33.96] },
+        { name: 'サンセットヒルズカントリークラブ', coords: [132.8284, 33.9938] },
+        { name: '西条ゴルフ倶楽部', coords: [133.1811, 33.9195] }
+      ];
+
+      // Target the params form in the HTML
+      const params = document.getElementById('params');
+
+      // Create variables to use in getIso()
+      const urlBase = 'https://api.mapbox.com/isochrone/v1/mapbox/';
+      const lon = 132.70341355675782; // updated longitude
+      const lat = 33.82894252956049; // updated latitude
+      let profile = 'cycling';
+      let minutes = 10;
+
+      // Set up a marker that you can use to show the query's coordinates
+      const marker = new mapboxgl.Marker({
+        'color': '#314ccd'
+      });
+
+      // Create a LngLat object to use in the marker initialization
+      const lngLat = {
+        lon: lon,
+        lat: lat
+      };
+
+      // ゴルフ場のマーカーとラベルを追加
+      golfCourses.forEach(course => {
+        const el = document.createElement('div');
+        el.className = 'marker';
+        el.style.backgroundColor = 'green';
+        el.style.width = '10px';
+        el.style.height = '10px';
+        el.style.borderRadius = '50%';
+
+        new mapboxgl.Marker(el)
+          .setLngLat(course.coords)
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(course.name))
+          .addTo(map);
+
+        // ラベルを追加
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = course.name;
+
+        new mapboxgl.Marker({
+          element: label,
+          anchor: 'left'
+        })
+          .setLngLat(course.coords)
+          .setOffset([15, 0])
+          .addTo(map);
+      });
+
+      // Create a function that sets up the Isochrone API query then makes a fetch call
+      async function getIso() {
+        try {
+          const query = await fetch(
+            `${urlBase}${profile}/${lon},${lat}?contours_minutes=${minutes}&polygons=true&access_token=${mapboxgl.accessToken}`,
+            { method: 'GET' }
+          );
+          if (!query.ok) {
+            throw new Error(`API request failed with status ${query.status}`);
+          }
+          const data = await query.json();
+          // Set the 'iso' source's data to what's returned by the API query
+          map.getSource('iso').setData(data);
+        } catch (error) {
+          console.error('Error fetching Isochrone data:', error);
+          alert('Isochrone data could not be retrieved. Please check the console for details.');
+        }
+      }
+
+      // When a user changes the value of profile or duration by clicking a button, change the parameter's value and make the API query again
+      params.addEventListener('change', (event) => {
+        if (event.target.name === 'profile') {
+          profile = event.target.value;
+        } else if (event.target.name === 'duration') {
+          minutes = parseInt(event.target.value, 10);
+        }
+        console.log(`Selected duration: ${minutes} minutes`);
+        getIso();
+      });
+
+      map.on('load', () => {
+        // When the map loads, add the source and layer
+        map.addSource('iso', {
+          type: 'geojson',
+          data: {
+            'type': 'FeatureCollection',
+            'features': []
+          }
+        });
+
+        map.addLayer(
+          {
+            'id': 'isoLayer',
+            'type': 'fill',
+            'source': 'iso',
+            'layout': {},
+            'paint': {
+              'fill-color': '#5a3fc0',
+              'fill-opacity': 0.3
+            }
+          },
+          'poi-label'
+        );
+
+        // Initialize the marker at the query coordinates
+        marker.setLngLat(lngLat).addTo(map);
+
+        // Make the API call
+        getIso();
+      });
+    </script>
+  </body>
+</html>
