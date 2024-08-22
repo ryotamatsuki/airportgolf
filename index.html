@@ -36,11 +36,23 @@
         padding: 2px;
         white-space: nowrap;
       }
+
+      #reset-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
     </style>
   </head>
 
   <body>
     <div id="map"></div>
+    <button id="reset-button">Reset to Initial Position</button>
 
     <div class="absolute fl my24 mx24 py24 px24 bg-gray-faint round">
       <form id="params">
@@ -49,6 +61,14 @@
           <label class="toggle-container">
             <input name="profile" type="radio" value="driving" checked />
             <div class="toggle toggle--active-null toggle--null">Driving</div>
+          </label>
+          <label class="toggle-container">
+            <input name="profile" type="radio" value="walking" />
+            <div class="toggle toggle--active-null toggle--null">Walking</div>
+          </label>
+          <label class="toggle-container">
+            <input name="profile" type="radio" value="cycling" />
+            <div class="toggle toggle--active-null toggle--null">Cycling</div>
           </label>
         </div>
         <h4 class="txt-m txt-bold mb6">Choose a maximum duration:</h4>
@@ -76,12 +96,34 @@
     <script>
       mapboxgl.accessToken = 'pk.eyJ1IjoiYnVkb3RvIiwiYSI6ImNtMDI4YnByNjFuNjYyanNmdXMzNHVvdnkifQ.FzJuyAndS1cOfzz3vLxv4w';
 
+      const initialLon = 132.703414;
+      const initialLat = 33.828943;
+      let profile = 'driving';
+      let minutes = 30;
+      let lngLat = { lon: initialLon, lat: initialLat }; // initial coordinates
+
       const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v12',
-        center: [132.703414, 33.828943], // updated starting position [lng, lat]
+        center: [lngLat.lon, lngLat.lat], // updated starting position [lng, lat]
         zoom: 11.5
       });
+
+      // Initialize draggable marker
+      const originA = new mapboxgl.Marker({
+        draggable: true
+      })
+        .setLngLat([lngLat.lon, lngLat.lat])
+        .addTo(map);
+
+      // When the marker is moved, refresh the isochrones
+      function onDragEndA() {
+        const newLngLat = originA.getLngLat();
+        lngLat = { lon: newLngLat.lng, lat: newLngLat.lat };
+        getIso([lngLat.lon, lngLat.lat]);
+      }
+
+      originA.on("dragend", onDragEndA);
 
       // ゴルフ場のデータ
       const golfCourses = [
@@ -110,27 +152,6 @@
         { name: '石手寺', coords: [132.796474, 33.847916] },
         { name: 'とべ動物園', coords: [132.791972, 33.764260] }
       ];
-
-      // Target the params form in the HTML
-      const params = document.getElementById('params');
-
-      // Create variables to use in getIso()
-      const urlBase = 'https://api.mapbox.com/isochrone/v1/mapbox/';
-      const lon = 132.703414; // updated longitude
-      const lat = 33.828943; // updated latitude
-      let profile = 'driving';
-      let minutes = 30;
-
-      // Set up a marker that you can use to show the query's coordinates
-      const marker = new mapboxgl.Marker({
-        'color': '#314ccd'
-      });
-
-      // Create a LngLat object to use in the marker initialization
-      const lngLat = {
-        lon: lon,
-        lat: lat
-      };
 
       // ゴルフ場のマーカーとラベルを追加
       golfCourses.forEach(course => {
@@ -188,18 +209,16 @@
           .addTo(map);
       });
 
-      // Create a function that sets up the Isochrone API query then makes a fetch call
-      async function getIso() {
+      async function getIso(lngLat) {
         try {
           const query = await fetch(
-            `${urlBase}${profile}/${lon},${lat}?contours_minutes=${minutes}&polygons=true&access_token=${mapboxgl.accessToken}`,
+            `https://api.mapbox.com/isochrone/v1/mapbox/${profile}/${lngLat[0]},${lngLat[1]}?contours_minutes=${minutes}&polygons=true&access_token=${mapboxgl.accessToken}`,
             { method: 'GET' }
           );
           if (!query.ok) {
             throw new Error(`API request failed with status ${query.status}`);
           }
           const data = await query.json();
-          // Set the 'iso' source's data to what's returned by the API query
           map.getSource('iso').setData(data);
         } catch (error) {
           console.error('Error fetching Isochrone data:', error);
@@ -207,17 +226,16 @@
         }
       }
 
-      // When a user changes the value of profile or duration by clicking a button, change the parameter's value and make the API query again
       params.addEventListener('change', (event) => {
-        if (event.target.name === 'duration') {
+        if (event.target.name === 'profile') {
+          profile = event.target.value;
+        } else if (event.target.name === 'duration') {
           minutes = parseInt(event.target.value, 10);
         }
-        console.log(`Selected duration: ${minutes} minutes`);
-        getIso();
+        getIso([lngLat.lon, lngLat.lat]);
       });
 
       map.on('load', () => {
-        // When the map loads, add the source and layer
         map.addSource('iso', {
           type: 'geojson',
           data: {
@@ -226,25 +244,25 @@
           }
         });
 
-        map.addLayer(
-          {
-            'id': 'isoLayer',
-            'type': 'fill',
-            'source': 'iso',
-            'layout': {},
-            'paint': {
-              'fill-color': '#5a3fc0',
-              'fill-opacity': 0.3
-            }
-          },
-          'poi-label'
-        );
+        map.addLayer({
+          'id': 'isoLayer',
+          'type': 'fill',
+          'source': 'iso',
+          'layout': {},
+          'paint': {
+            'fill-color': '#5a3fc0',
+            'fill-opacity': 0.3
+          }
+        });
 
-        // Initialize the marker at the query coordinates
-        marker.setLngLat(lngLat).addTo(map);
+        getIso([lngLat.lon, lngLat.lat]); // Initial Isochrone display
+      });
 
-        // Make the API call
-        getIso();
+      // Reset to initial position
+      document.getElementById('reset-button').addEventListener('click', () => {
+        lngLat = { lon: initialLon, lat: initialLat };
+        originA.setLngLat([lngLat.lon, lngLat.lat]).addTo(map);
+        getIso([lngLat.lon, lngLat.lat]);
       });
     </script>
   </body>
